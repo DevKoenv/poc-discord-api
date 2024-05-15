@@ -23,11 +23,14 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
-          tags: ${{ github.event.repository.name }}:${{ github.sha }}
+          tags: |
+            ${{ github.event.repository.name }}:latest
+            ${{ github.event.repository.name }}:${{ github.sha }}
 
-      - name: Save Docker image to file
+
+      - name: Save and gzip Docker image to file
         run: |
-          docker save -o ${{ github.event.repository.name }}-${{ github.sha }}.tar ${{ github.event.repository.name }}
+          docker save poc-discord-api:${{ github.sha }} | gzip > ${{ github.event.repository.name }}-${{ github.sha }}.tar.gz
 
       - name: Transfer Docker image to server
         uses: appleboy/scp-action@master
@@ -36,8 +39,8 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
-          source: ${{ github.event.repository.name }}-${{ github.sha }}.tar
-          target: /var/tmp/${{ github.event.repository.name }}-${{ github.sha }}.tar
+          source: ${{ github.event.repository.name }}-${{ github.sha }}.tar.gz
+          target: /var/tmp/${{ github.event.repository.name }}-${{ github.sha }}.tar.gz
 
       - name: SSH into server and load Docker image
         uses: appleboy/ssh-action@master
@@ -47,9 +50,8 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            cd /var/tmp/
-            docker load -i ${{ github.event.repository.name }}-${{ github.sha }}.tar
-            rm ${{ github.event.repository.name }}-${{ github.sha }}.tar
+            docker load < /var/tmp/${{ github.event.repository.name }}-${{ github.sha }}.tar.gz
+            rm /var/tmp/${{ github.event.repository.name }}-${{ github.sha }}.tar.gz
 
       - name: SSH into server and restart Docker container
         uses: appleboy/ssh-action@master
