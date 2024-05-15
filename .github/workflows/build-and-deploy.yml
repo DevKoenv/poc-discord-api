@@ -40,7 +40,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           source: ${{ github.event.repository.name }}-${{ github.sha }}.tar.gz
-          target: /var/tmp/${{ github.event.repository.name }}-${{ github.sha }}.tar.gz
+          target: /var/tmp/
 
       - name: SSH into server and load Docker image
         uses: appleboy/ssh-action@master
