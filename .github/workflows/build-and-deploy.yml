@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,42 +17,36 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Login to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.REGISTRY_URL }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Set up Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.REGISTRY_URL }}/${{ github.repository }}
+          tags: |
+            type=sha
+            type=raw,value=latest
+
       - name: Build Docker image for multiple architectures
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64
-          tags: |
-            ${{ github.event.repository.name }}:latest
-            ${{ github.event.repository.name }}:${{ github.sha }}
+          platforms: linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
 
-      - name: Save and gzip Docker image to file
-        run: |
-          docker save poc-discord-api:${{ github.sha }} | gzip > ${{ github.event.repository.name }}-${{ github.sha }}.tar.gz
-
-      - name: Transfer Docker image to server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          port: ${{ secrets.SERVER_PORT }}
-          source: ${{ github.event.repository.name }}-${{ github.sha }}.tar.gz
-          target: /var/tmp/
-
-      - name: SSH into server and load Docker image
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          port: ${{ secrets.SERVER_PORT }}
-          script: |
-            docker load < /var/tmp/${{ github.event.repository.name }}-${{ github.sha }}.tar.gz
-            rm /var/tmp/${{ github.event.repository.name }}-${{ github.sha }}.tar.gz
-
+    steps:
       - name: SSH into server and restart Docker container
         uses: appleboy/ssh-action@master
         with:
@@ -62,4 +56,4 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             cd /opt/poc-discord/
-            docker compose --progress quiet up -d --no-deps --build backend
+            docker compose --progress quiet up -d --no-deps --build api
