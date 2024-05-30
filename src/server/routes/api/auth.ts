@@ -73,11 +73,9 @@ app.post("/token", async (req, res) => {
       refreshToken: dbUser.refreshToken,
     });
 
-    const userRole = await Role.findOne({ where: { name: "USER" } });
-    const adminRole = await Role.findOne({ where: { name: "ADMIN" } });
-    if (userRole && adminRole) {
-      await user.setRoles([userRole, adminRole]);
-    }
+    const [userRole] = await Role.findOrCreate({ where: { name: "USER" } });
+    await user.setRoles([userRole]);
+    
   } else {
     // If the user exists, update it
     await user.update({
