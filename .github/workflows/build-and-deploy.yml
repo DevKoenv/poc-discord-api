@@ -56,4 +56,6 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             cd /opt/poc-discord/
-            docker compose --progress quiet up -d --no-deps --build api
+            docker compose pull api
+            docker compose up -d --no-deps --build api
+            docker image prune -f
