@@ -40,4 +40,4 @@ ENV NODE_ENV=production
 EXPOSE 8080/tcp
 
 # Serve the app
-ENTRYPOINT [ "sh", "-c", "bun run --bun /usr/src/app/src/index.ts" ]
+ENTRYPOINT [ "bun", "run", "/usr/src/app/src/index.ts" ]
