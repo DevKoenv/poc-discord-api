@@ -24,5 +24,13 @@ io.on("connection", async (socket) => {
   // });
 });
 
+process.on('unhandledRejection', (reason, promise) => {
+  io.emit('log', { log_type: 'error', message: `Unhandled Rejection at: ${promise}, reason: ${reason}` });
+});
+
+process.on('uncaughtException', (err) => {
+  io.emit('log', { log_type: 'error', message: `Uncaught Exception: ${err.message}` });
+});
+
 export { socketServer, io };
 export default io;
