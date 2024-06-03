@@ -28,6 +28,33 @@ app.get("/:id", async (req, res) => {
   */
 });
 
+app.put("/:id", async (req, res) => {
+  if (!req.params.id) return res.status(400).json({ error: "Missing id" });
+
+  const guild = await Guild.findOne({
+    where: { id: req.params.id },
+  });
+
+  if (!guild) return res.status(404).json({ error: "Guild not found" });
+
+  await guild.update(req.body);
+
+  return res.json(guild);
+  /*
+    #swagger.responses[200] = {
+      description: 'Guild updated',
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            $ref: '#/components/schemas/Guild'
+          }
+        }
+      }
+    }
+  */
+});
+
 app.get("/:id/commands", async (req, res) => {
   if (!req.params.id) return res.status(400).json({ error: "Missing id" });
 

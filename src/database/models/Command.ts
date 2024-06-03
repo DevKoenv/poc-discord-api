@@ -20,7 +20,7 @@ class Command extends Model<
 
   // Custom fields
   declare trigger: string;
-  declare response: string;
+  declare response: ResponseJson;
   declare interaction: CreationOptional<string>;
 
   // Timestamps
