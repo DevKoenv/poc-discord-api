@@ -16,6 +16,8 @@ async function startApp() {
 
     server = new Server();
     await server.start();
+
+    console.log("App started! " + new Date().toISOString());
   } catch (error) {
     console.error(error);
 

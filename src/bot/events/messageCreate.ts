@@ -44,21 +44,36 @@ class MessageCreateEvent extends BaseEvent {
 
     if (command) {
       // Get the response JSON from the command
-      const responseJson: ResponseJson = JSON.parse(command.response);
+      if (typeof command.response === "string") {
+        // Parse the response JSON if it's a string
+        try {
+          command.response = JSON.parse(command.response);
+        } catch (error) {
+          console.error(error);
+          return;
+        }
+      }
+      const responseJson: ResponseJson = command.response;
 
       // Check if the response JSON is empty
       if (!responseJson) return;
 
       // Create embeds using EmbedBuilder
-      // Function to replace "{x}" with args[x]
+      // Function to replace "${x}" with args[x] where x is a number
       function replaceArgs(str: string, args: any[]): string {
-        return str.replace(/\{(\d+)\}/g, (match, group1) => {
+        return str.replace(/\$\{(\d+)\}/g, (match, group1) => {
           const index = parseInt(group1);
-          return args[index] !== undefined ? args[index] : match;
+          return args[index-1] !== undefined ? args[index-1] : match;
         });
       }
 
-      // Replace "{x}" with args[x] in content
+      console.log(
+        args,
+        responseJson.content,
+        replaceArgs(responseJson.content, args)
+      );
+
+      // Replace "${x}" with args[x] in content
       responseJson.content = replaceArgs(responseJson.content, args);
 
       // Create embeds using EmbedBuilder
@@ -72,10 +87,13 @@ class MessageCreateEvent extends BaseEvent {
               embed.setColor(colorInt);
             }
             if (embedData.title) embed.setTitle(embedData.title);
-            if (embedData.description) embed.setDescription(embedData.description);
+            if (embedData.description)
+              embed.setDescription(embedData.description);
             if (embedData.url) embed.setURL(embedData.url);
-            if (embedData.timestamp) embed.setTimestamp(new Date(embedData.timestamp));
-            if (embedData.thumbnail) embed.setThumbnail(embedData.thumbnail.url);
+            if (embedData.timestamp)
+              embed.setTimestamp(new Date(embedData.timestamp));
+            if (embedData.thumbnail)
+              embed.setThumbnail(embedData.thumbnail.url);
             if (embedData.image) embed.setImage(embedData.image.url);
             if (embedData.author) embed.setAuthor(embedData.author);
             if (embedData.footer) embed.setFooter(embedData.footer);
@@ -125,9 +143,11 @@ class MessageCreateEvent extends BaseEvent {
                       .setLabel(option.label)
                       .setValue(option.value);
 
-                    if (option.description) optionBuilder.setDescription(option.description);
+                    if (option.description)
+                      optionBuilder.setDescription(option.description);
                     if (option.emoji) optionBuilder.setEmoji(option.emoji);
-                    if (option.default) optionBuilder.setDefault(option.default);
+                    if (option.default)
+                      optionBuilder.setDefault(option.default);
 
                     return optionBuilder;
                   })

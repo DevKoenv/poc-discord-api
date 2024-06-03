@@ -22,6 +22,7 @@
     "express": "^4.19.2",
     "jose": "^5.2.4",
     "mariadb": "^3.3.0",
+    "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.3",
     "socket.io": "^4.7.5",
     "sqlite3": "^5.1.7",
