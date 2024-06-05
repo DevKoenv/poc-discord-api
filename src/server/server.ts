@@ -1,11 +1,11 @@
 import express from "express";
 import cors from "cors";
 import routes from "./routes";
-import { corsConfig } from "../config";
+import { serverConfig } from "../config";
 
 const app = express();
 
-app.use(cors(corsConfig as any));
+app.use(cors(serverConfig.cors));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
