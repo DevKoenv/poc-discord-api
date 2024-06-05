@@ -67,12 +67,6 @@ class MessageCreateEvent extends BaseEvent {
         });
       }
 
-      console.log(
-        args,
-        responseJson.content,
-        replaceArgs(responseJson.content, args)
-      );
-
       // Replace "${x}" with args[x] in content
       responseJson.content = replaceArgs(responseJson.content, args);
 
@@ -164,8 +158,8 @@ class MessageCreateEvent extends BaseEvent {
       const response = await message.reply({
         allowedMentions: { repliedUser: false },
         content: responseJson.content,
-        embeds,
-        components,
+        embeds: embeds,
+        components: components,
       });
 
       // Create a message component collector if there are any components
