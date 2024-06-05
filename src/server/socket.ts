@@ -2,11 +2,11 @@ import { createServer } from "http";
 import { Server as IOServer } from "socket.io";
 import app from "./server";
 // import { Log } from "../database/models/Log";
-import { serverConfig } from "../config";
+import { corsConfig } from "../config";
 
 const socketServer = createServer(app);
 const io = new IOServer(socketServer, {
-  cors: serverConfig.cors,
+  cors: corsConfig as any,
 });
 
 io.on("connection", async (socket) => {

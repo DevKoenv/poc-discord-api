@@ -5,7 +5,7 @@ import { corsConfig } from "../config";
 
 const app = express();
 
-app.use(cors(corsConfig));
+app.use(cors(corsConfig as any));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
