@@ -4,17 +4,13 @@ import { Guild } from "../../../database";
 const app = Router();
 
 app.get("/:id", async (req, res) => {
-  if (!req.params.id) {
-    return res.status(400).json({ error: "Missing id" });
-  }
+  if (!req.params.id) return res.status(400).json({ error: "Missing id" });
 
   const guild = await Guild.findOne({
     where: { id: req.params.id },
   });
 
-  if (!guild) {
-    return res.status(404).json({ error: "Guild not found" });
-  }
+  if (!guild) return res.status(404).json({ error: "Guild not found" });
 
   return res.json(guild);
   /*
@@ -33,17 +29,13 @@ app.get("/:id", async (req, res) => {
 });
 
 app.put("/:id", async (req, res) => {
-  if (!req.params.id) {
-    return res.status(400).json({ error: "Missing id" });
-  }
+  if (!req.params.id) return res.status(400).json({ error: "Missing id" });
 
   const guild = await Guild.findOne({
     where: { id: req.params.id },
   });
 
-  if (!guild) {
-    return res.status(404).json({ error: "Guild not found" });
-  }
+  if (!guild) return res.status(404).json({ error: "Guild not found" });
 
   await guild.update(req.body);
 
@@ -64,15 +56,11 @@ app.put("/:id", async (req, res) => {
 });
 
 app.get("/:id/commands", async (req, res) => {
-  if (!req.params.id) {
-    return res.status(400).json({ error: "Missing id" });
-  }
+  if (!req.params.id) return res.status(400).json({ error: "Missing id" });
 
   const guild = await Guild.findOne({ where: { id: req.params.id } });
 
-  if (!guild) {
-    return res.status(404).json({ error: "Guild not found" });
-  }
+  if (!guild) return res.status(404).json({ error: "Guild not found" });
 
   const commands = await guild.getCommands();
 
@@ -95,26 +83,20 @@ app.get("/:id/commands", async (req, res) => {
 });
 
 app.get("/:id/commands/:commandId", async (req, res) => {
-  if (!req.params.id) {
-    return res.status(400).json({ error: "Missing id" });
-  }
-  if (!req.params.commandId) {
+  if (!req.params.id) return res.status(400).json({ error: "Missing id" });
+  if (!req.params.commandId)
     return res.status(400).json({ error: "Missing commandId" });
-  }
 
   const guild = await Guild.findOne({ where: { id: req.params.id } });
 
-  if (!guild) {
-    return res.status(404).json({ error: "Guild not found" });
-  }
+  if (!guild) return res.status(404).json({ error: "Guild not found" });
 
   const command = await guild.getCommands({
     where: { id: req.params.commandId },
   });
 
-  if (!command.length) {
+  if (!command.length)
     return res.status(404).json({ error: "Command not found" });
-  }
 
   return res.json(command[0]);
   /*
@@ -133,23 +115,15 @@ app.get("/:id/commands/:commandId", async (req, res) => {
 });
 
 app.post("/:id/commands", async (req, res) => {
-  if (!req.params.id) {
-    return res.status(400).json({ error: "Missing id" });
-  }
-  if (!req.body.trigger) {
+  if (!req.params.id) return res.status(400).json({ error: "Missing id" });
+  if (!req.body.trigger)
     return res.status(400).json({ error: "Missing trigger" });
-  }
-  if (!req.body.response) {
-    if (!req.body.response.content || req.body.response.embeds.length === 0) {
-      return res.status(400).json({ error: "Missing response" });
-    }
-  }
+  if (!req.body.response || !req.body.response.content)
+    return res.status(400).json({ error: "Missing response content" });
 
   const guild = await Guild.findOne({ where: { id: req.params.id } });
 
-  if (!guild) {
-    return res.status(404).json({ error: "Guild not found" });
-  }
+  if (!guild) return res.status(404).json({ error: "Guild not found" });
 
   if (req.body.trigger.startsWith(guild.prefix)) {
     return res
@@ -188,18 +162,13 @@ app.post("/:id/commands", async (req, res) => {
 });
 
 app.put("/:id/commands/:commandId", async (req, res) => {
-  if (!req.params.id) {
-    return res.status(400).json({ error: "Missing id" });
-  }
-  if (!req.params.commandId) {
+  if (!req.params.id) return res.status(400).json({ error: "Missing id" });
+  if (!req.params.commandId)
     return res.status(400).json({ error: "Missing commandId" });
-  }
 
   const guild = await Guild.findOne({ where: { id: req.params.id } });
 
-  if (!guild) {
-    return res.status(404).json({ error: "Guild not found" });
-  }
+  if (!guild) return res.status(404).json({ error: "Guild not found" });
 
   const command = await guild.getCommands({
     where: { id: req.params.commandId },
@@ -240,18 +209,13 @@ app.put("/:id/commands/:commandId", async (req, res) => {
 });
 
 app.delete(":id/commands/:commandId", async (req, res) => {
-  if (!req.params.id) {
-    return res.status(400).json({ error: "Missing id" });
-  }
-  if (!req.params.commandId) {
+  if (!req.params.id) return res.status(400).json({ error: "Missing id" });
+  if (!req.params.commandId)
     return res.status(400).json({ error: "Missing commandId" });
-  }
 
   const guild = await Guild.findOne({ where: { id: req.params.id } });
 
-  if (!guild) {
-    return res.status(404).json({ error: "Guild not found" });
-  }
+  if (!guild) return res.status(404).json({ error: "Guild not found" });
 
   const command = await guild.getCommands({
     where: { id: req.params.commandId },
