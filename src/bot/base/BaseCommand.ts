@@ -1,13 +1,20 @@
-import { CommandInteraction, Client, type ApplicationCommandOptionData } from "discord.js";
+import { Client, Message } from "discord.js";
 
 abstract class BaseCommand {
-  constructor(protected client: Client) {}
+  protected client: Client;
+  protected category: string = __dirname.split("/").pop() || "Other";
 
   abstract name: string;
   abstract description: string;
-  options?: ApplicationCommandOptionData[] = [];
+  abstract enabled: boolean;
+  abstract aliases: string[];
+  abstract ownerOnly: boolean;
 
-  abstract run(interaction: CommandInteraction): void;
+  abstract run(message: Message): void;
+
+  constructor(client: Client) {
+    this.client = client;
+  }
 }
 
 export default BaseCommand;

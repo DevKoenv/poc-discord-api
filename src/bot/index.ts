@@ -1,6 +1,6 @@
 import { Client, GatewayIntentBits, Collection } from "discord.js";
 import { discordConfig } from "../config";
-import { readdirSync } from "fs";
+import { readdirSync, lstatSync } from "fs";
 import { join } from "path";
 
 class DiscordBot {
@@ -18,7 +18,7 @@ class DiscordBot {
     });
 
     this.loadEvents();
-    this.loadSlashCommands();
+    this.loadCommands(join(__dirname, "commands"));
   }
 
   private loadEvents() {
@@ -31,38 +31,23 @@ class DiscordBot {
     }
   }
 
-  private loadSlashCommands() {
-    const slashCommandFiles = readdirSync(join(__dirname, "commands"));
+  private loadCommands(directory: string) {
+    const commandFiles = readdirSync(directory);
 
-    for (const file of slashCommandFiles) {
-      const CommandClass = require(`./commands/${file}`).default;
-      const command = new CommandClass(this.client);
-      this.commands.set(command.name, command);
-    }
-  }
-
-  private async registerSlashCommands() {
-    if (!this.client.application) return;
-
-    // Unregister all the commands first to avoid conflicts
-    for (const command of this.commands.values()) {
-      await this.client.application.commands.cache
-        .find((c) => c.name === command.name)
-        ?.delete();
-    }
-
-    for (const command of this.commands.values()) {
-      await this.client.application.commands.create({
-        name: command.name,
-        description: command.description,
-        options: command.options,
-      });
+    for (const file of commandFiles) {
+      const fullPath = join(directory, file);
+      if (lstatSync(fullPath).isDirectory()) {
+        this.loadCommands(fullPath); // Recursively load commands from subdirectories
+      } else if (file.endsWith(".ts") || file.endsWith(".js")) {
+        const CommandClass = require(fullPath).default;
+        const command = new CommandClass();
+        this.commands.set(command.name, command); // Assuming each command class has a 'name' property
+      }
     }
   }
 
   public async start() {
     await this.client.login(discordConfig.bot_token);
-    await this.registerSlashCommands();
   }
 
   public async stop() {
