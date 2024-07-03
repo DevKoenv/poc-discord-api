@@ -1,10 +1,13 @@
 import Server from "./server";
 import Database from "./database";
 import DiscordBot from "./bot";
+import Logger from "./utils/logger";
 
 let database: Database | null = null;
 let bot: DiscordBot | null = null;
 let server: Server | null = null;
+
+import pkg from "../package.json";
 
 async function startApp() {
   try {
@@ -16,10 +19,8 @@ async function startApp() {
 
     server = new Server();
     await server.start();
-
-    console.log("App started! " + new Date().toISOString());
   } catch (error) {
-    console.error(error);
+    Logger.error(error);
 
     await stopApp();
   }
@@ -39,7 +40,7 @@ async function stopApp() {
       await database.stop();
     }
   } catch (error) {
-    console.error(error);
+    Logger.error(error);
   } finally {
     return process.exit(1);
   }

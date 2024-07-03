@@ -1,11 +1,12 @@
 import { Guild } from "../../database";
+import Logger from "../../utils/logger";
 import BaseEvent from "../base/BaseEvent";
 
 class ReadyEvent extends BaseEvent {
   name = "ready";
 
   async run() {
-    console.log("Bot is ready!");
+    Logger.ready("Bot is ready!")
 
     const guilds = this.client.guilds.cache;
 

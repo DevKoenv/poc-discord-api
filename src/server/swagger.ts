@@ -37,7 +37,7 @@ async function setupSwagger() {
   const endpointsFiles = ["./src/server/routes/index.ts"];
 
   if (process.env.NODE_ENV !== "production") {
-    await swaggerAutogen({ openapi: "3.0.3" })(outputFile, endpointsFiles, doc);
+    await swaggerAutogen({ openapi: "3.0.3", disableLogs: true })(outputFile, endpointsFiles, doc);
   }
 
   app.use("/docs", swaggerUi.serve, swaggerUi.setup(require(outputFile)));

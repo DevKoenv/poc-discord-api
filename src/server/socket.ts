@@ -18,7 +18,7 @@ io.on("connection", async (socket) => {
   //   io.emit("log", {
   //     log_level: log.level,
   //     message: log.message,
-  //     log_time: log.timestamp.toISOString().replace("T", " ").split(".")[0],
+  //     log_time: format(new Date(Date.now())),
   //     stacktrace: log.stacktrace,
   //   });
   // });

@@ -5,6 +5,7 @@ import Role from "./models/Role";
 import Log from "./models/Log";
 import Guild from "./models/Guild";
 import Command from "./models/Command";
+import Logger from "../utils/logger";
 
 class Database {
   private sequelize: Sequelize;
@@ -51,7 +52,7 @@ class Database {
     try {
       // Test the database connection
       await this.sequelize.authenticate();
-      console.log(
+      Logger.db(
         "Connection to the database has been established successfully."
       );
 
@@ -63,18 +64,18 @@ class Database {
         force,
       });
 
-      console.log("Database has been synced.");
+      Logger.ready("Database has been synced.");
     } catch (error) {
-      console.error("Unable to sync the database:", error);
+      Logger.error("Unable to sync the database:", error);
     }
   }
 
   public async stop() {
     try {
       await this.sequelize.close();
-      console.log("Database connection closed.");
+      Logger.log("Database connection closed.");
     } catch (error) {
-      console.error("Unable to close the database connection:", error);
+      Logger.error("Unable to close the database connection:", error);
     }
   }
 }

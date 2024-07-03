@@ -4,6 +4,7 @@ import {
   type ApplicationCommandOptionData,
 } from "discord.js";
 import BaseCommand from "../base/BaseCommand";
+import Logger from "../../utils/logger";
 
 class PingCommand extends BaseCommand {
   name = "ping";
@@ -23,6 +24,7 @@ class PingCommand extends BaseCommand {
 
     if (subcommand) {
       interaction.reply(`You said: ${subcommand}`);
+      Logger.log(`User ${interaction.user.tag} used the ping command with the input: ${subcommand}`)
       return;
     }
 

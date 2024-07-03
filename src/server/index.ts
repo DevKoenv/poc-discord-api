@@ -1,6 +1,7 @@
 import { Server as httpServer } from "http";
 import { socketServer } from "./socket";
 import { setupSwagger } from "./swagger";
+import Logger from "../utils/logger";
 
 class Server {
   private server: httpServer;
@@ -15,13 +16,13 @@ class Server {
     await setupSwagger();
 
     this.server.listen(this.port, () => {
-      console.log(`Server is running on port ${this.port}.`);
+      Logger.ready(`Webserver is running on port ${this.port}.`);
     });
   }
 
   public stop() {
     this.server.close(() => {
-      console.log(`Server stopped on port ${this.port}.`);
+      Logger.log(`Webserver stopped on port ${this.port}.`);
     });
   }
 }
