@@ -1,5 +1,6 @@
 import { EncryptJWT, jwtDecrypt } from "jose";
 import { jwtConfig } from "../config";
+import Logger from "./logger";
 
 const generateEncryptedToken = (payload: any) => {
   try {
@@ -8,7 +9,7 @@ const generateEncryptedToken = (payload: any) => {
       .setIssuedAt()
       .encrypt(Buffer.from(jwtConfig.jwt_secret, "hex"));
   } catch (error) {
-    console.error('Error generating encrypted token:', error);
+    Logger.error('Error generating encrypted token:', error);
     // throw error;
     return null;
   }
@@ -18,7 +19,7 @@ const decodeToken = async (token: string) => {
   try {
     return await jwtDecrypt(token, Buffer.from(jwtConfig.jwt_secret, "hex"));
   } catch (error) {
-    console.error('Error decoding token:', error);
+    Logger.error('Error decoding token:', error);
     // throw error;
     return null;
   }
