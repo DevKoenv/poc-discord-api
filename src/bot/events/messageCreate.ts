@@ -10,6 +10,7 @@ import BaseEvent from "../base/BaseEvent";
 import { Guild } from "../../database";
 import executeCode from "../../utils/vm";
 import type { ResponseJson } from "../../../types/command";
+import Logger from "../../utils/logger";
 
 class MessageCreateEvent extends BaseEvent {
   name = "messageCreate";
@@ -43,13 +44,19 @@ class MessageCreateEvent extends BaseEvent {
     );
 
     if (command) {
+      Logger.cmd(
+        "User %s executed custom command %s",
+        message.author.tag,
+        trigger
+      );
+
       // Get the response JSON from the command
       if (typeof command.response === "string") {
         // Parse the response JSON if it's a string
         try {
           command.response = JSON.parse(command.response);
         } catch (error) {
-          console.error(error);
+          Logger.error(error);
           return;
         }
       }
@@ -63,7 +70,7 @@ class MessageCreateEvent extends BaseEvent {
       function replaceArgs(str: string, args: any[]): string {
         return str.replace(/\$\{(\d+)\}/g, (match, group1) => {
           const index = parseInt(group1);
-          return args[index-1] !== undefined ? args[index-1] : match;
+          return args[index - 1] !== undefined ? args[index - 1] : match;
         });
       }
 

@@ -1,5 +1,6 @@
 import { type Interaction } from "discord.js";
 import BaseEvent from "../base/BaseEvent";
+import Logger from "../../utils/logger";
 
 class InteractionCreateEvent extends BaseEvent {
   name = "interactionCreate";
@@ -11,9 +12,14 @@ class InteractionCreateEvent extends BaseEvent {
       if (!command) return;
 
       try {
+        Logger.cmd(
+          "User %s executed command %s",
+          interaction.user.tag,
+          command.name
+        );
         await command.run(interaction);
       } catch (error) {
-        console.error(error);
+        Logger.error(error);
         await interaction.reply({
           content: "There was an error while executing this command!",
           ephemeral: true,
