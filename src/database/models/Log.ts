@@ -5,7 +5,9 @@ import {
   type CreationOptional,
   type InferAttributes,
   type InferCreationAttributes,
+  Op,
 } from "sequelize";
+import Logger from "../../utils/logger";
 
 class Log extends Model<InferAttributes<Log>, InferCreationAttributes<Log>> {
   declare id: CreationOptional<number>;
@@ -13,8 +15,8 @@ class Log extends Model<InferAttributes<Log>, InferCreationAttributes<Log>> {
   // Custom fields
   declare level: string;
   declare message: string;
-  declare stack: CreationOptional<string>;
-  declare timestamp: Date;
+  declare stacktrace: CreationOptional<string>
+  declare date: Date;
 
   // Associations
   public static associations: {};
@@ -35,7 +37,7 @@ class Log extends Model<InferAttributes<Log>, InferCreationAttributes<Log>> {
           type: DataTypes.TEXT,
           allowNull: true,
         },
-        timestamp: {
+        date: {
           type: DataTypes.DATE,
           allowNull: false,
         },
@@ -46,6 +48,24 @@ class Log extends Model<InferAttributes<Log>, InferCreationAttributes<Log>> {
         timestamps: false,
       }
     );
+  }
+
+  /**
+   * Deletes logs older than a specified number of days.
+   * @param days The number of days after which logs should be deleted.
+   */
+  public static async deleteOldLogs(days: number): Promise<void> {
+    Logger.db("Deleting logs older than %s days.", days);
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+
+    await Log.destroy({
+      where: {
+        date: {
+          [Op.lt]: cutoffDate,
+        },
+      },
+    });
   }
 }
 

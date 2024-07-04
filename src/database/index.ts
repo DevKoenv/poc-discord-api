@@ -1,5 +1,6 @@
 import { Sequelize, type Dialect } from "sequelize";
 import { dbConfig } from "../config";
+import cron from "node-cron";
 import User from "./models/User";
 import Role from "./models/Role";
 import Log from "./models/Log";
@@ -62,6 +63,12 @@ class Database {
       // Sync the database
       await this.sequelize.sync({
         force,
+      });
+
+      cron.schedule("0 0 * * *", async () => {
+        Logger.db("Running database schedules.");
+
+        await Log.deleteOldLogs(30);
       });
 
       Logger.ready("Database has been synced.");
