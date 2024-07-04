@@ -7,8 +7,6 @@ let database: Database | null = null;
 let bot: DiscordBot | null = null;
 let server: Server | null = null;
 
-import pkg from "../package.json";
-
 async function startApp() {
   try {
     database = new Database();
@@ -19,6 +17,7 @@ async function startApp() {
 
     server = new Server();
     await server.start();
+
   } catch (error) {
     Logger.error(error);
 

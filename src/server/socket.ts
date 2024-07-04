@@ -3,6 +3,8 @@ import { Server as IOServer } from "socket.io";
 import app from "./server";
 // import { Log } from "../database/models/Log";
 import { serverConfig } from "../config";
+import { Log } from "../database";
+import { format } from "../utils/date";
 
 const socketServer = createServer(app);
 const io = new IOServer(socketServer, {
@@ -10,18 +12,17 @@ const io = new IOServer(socketServer, {
 });
 
 io.on("connection", async (socket) => {
-  // const logs = await Log.findAll({
-  //   limit: 50,
-  //   order: [["timestamp", "DESC"]],
-  // });
-  // logs.reverse().forEach((log) => {
-  //   io.emit("log", {
-  //     log_level: log.level,
-  //     message: log.message,
-  //     log_time: format(new Date(Date.now())),
-  //     stacktrace: log.stacktrace,
-  //   });
-  // });
+  const logs = await Log.findAll({
+    limit: 50,
+    order: [["date", "DESC"]],
+  });
+  logs.reverse().forEach((log) => {
+    io.emit("log", {
+      log_type: log.level,
+      message: log.message,
+      log_time: format(new Date(log.date)),
+    });
+  });
 });
 
 process.on('unhandledRejection', (reason, promise) => {

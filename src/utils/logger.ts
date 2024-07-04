@@ -1,48 +1,33 @@
 import chalk from "chalk";
 import util from "util";
 import io from "../server/socket";
-
-function dateTimePad(value: number, digits: number): string {
-  let number = value.toString();
-  while (number.length < digits) {
-    number = "0" + number;
-  }
-  return number;
-}
-
-function format(tDate: Date): string {
-  return (
-    tDate.getFullYear() +
-    "-" +
-    dateTimePad(tDate.getMonth() + 1, 2) +
-    "-" +
-    dateTimePad(tDate.getDate(), 2) +
-    " " +
-    dateTimePad(tDate.getHours(), 2) +
-    ":" +
-    dateTimePad(tDate.getMinutes(), 2) +
-    ":" +
-    dateTimePad(tDate.getSeconds(), 2) +
-    "." +
-    dateTimePad(tDate.getMilliseconds(), 3)
-  );
-}
+import { Log } from "../database";
+import { format } from "./date";
 
 class Logger {
-  private static logMessage(
+  private static async logMessage(
     args: any[], // Accept an array of arguments
     type: string,
     color: (text: string) => string
-  ): void {
-    const date = `[${format(new Date(Date.now()))}]:`;
+  ): Promise<void> {
+    const timestamp = new Date(Date.now());
+    const date = `[${format(timestamp)}]:`;
     const coloredType = color(type.toUpperCase());
     console.log(date, coloredType, ...args);
 
-    io.emit("log", {
-      id: Date.now(),
-      log_time: format(new Date(Date.now())),
-      log_type: type,
+    const log = await Log.create({
+      level: type,
       message: util.format(...args),
+      // stacktrace: '',
+      date: new Date(timestamp),
+    });
+    
+    io.emit("log", {
+      id: log.id,
+      log_level: log.level,
+      log_time: format(new Date(log.date)),
+      message: log.message,
+      // stacktrace: '',
     });
   }
 
