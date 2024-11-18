@@ -15,13 +15,15 @@
 		3306
 	],
 	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2": {},
 		"ghcr.io/devcontainers/features/git:1": {},
-		"ghcr.io/devcontainers-community/npm-features/prettier:1": {}
+		"ghcr.io/devcontainers/features/common-utils:2": {}
 	},
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "bun install"
+	"postCreateCommand": [
+		"bun install",
+		"cp .env.example .env"
+	],
 
 	// Configure tool-specific properties.
 	"customizations": {
